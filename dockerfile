@@ -1,18 +1,16 @@
-FROM ubuntu:20.04
+# Use a base image with Ollama installed
+FROM ollama/ollama:latest
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Set working directory
+WORKDIR /app
 
-# Install Ollama
-RUN curl -fsSL https://ollama.com/install.sh | sh
+# Ensure Ollama starts before pulling the model
+RUN ollama serve & \
+    sleep 5 && \
+    ollama pull deepseek-r1:8b
 
-# Pull the DeepSeek-R1 8B model
-RUN ollama pull deepseek-r1:8b
-
-# Expose the port that Ollama will use
+# Expose the port Ollama uses
 EXPOSE 11434
 
-# Start the Ollama server
+# Start Ollama when the container runs
 CMD ["ollama", "serve"]
